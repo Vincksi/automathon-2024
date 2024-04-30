@@ -214,13 +214,17 @@ experimental_dataset = VideoDataset(dataset_dir, dataset_choice="experimental", 
 class DeepfakeDetector(nn.Module):
     def __init__(self, nb_frames=10):
         super().__init__()
-        self.dense = nn.Linear(nb_frames*3*256*256,1)
+        self.dense1 = nn.Linear(nb_frames*3*256*256, 1024)  # Couche dense supplémentaire
+        self.dense2 = nn.Linear(1024, 1)  # Couche de sortie
         self.flat = nn.Flatten()
+        self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         y = self.flat(x)
-        y = self.dense(y)
+        y = self.dense1(y)
+        y = self.relu(y)  # Activation ReLU après la première couche dense supplémentaire
+        y = self.dense2(y)
         y = self.sigmoid(y)
         return y
 
