@@ -220,7 +220,7 @@ experimental_dataset = VideoDataset(dataset_dir, dataset_choice="experimental", 
 
 # MODELE
 
-class CNN(nn.Module):
+class DeepFakeDetector(nn.Module):
     def __init__(self, nb_frame=10):
         super(CNN, self).__init__()
         # Couche de convolution 1
