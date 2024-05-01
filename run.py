@@ -222,6 +222,7 @@ experimental_dataset = VideoDataset(dataset_dir, dataset_choice="experimental", 
 
 class DeepfakeDetector(nn.Module):
     def __init__(self, nb_frame=10):
+        super().__init__()
         # Couche de convolution 1
         self.conv1 = nn.Conv2d(nb_frames*3*256*256, 32, kernel_size=3)
         # Couche de convolution 2
