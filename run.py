@@ -220,22 +220,34 @@ experimental_dataset = VideoDataset(dataset_dir, dataset_choice="experimental", 
 
 # MODELE
 
-class DeepfakeDetector(nn.Module):
-    def __init__(self, nb_frames=10):
-        super().__init__()
-        self.dense1 = nn.Linear(nb_frames*3*256*256, 1024)  # Couche dense supplémentaire
-        self.dense2 = nn.Linear(1024, 1)  # Couche de sortie
-        self.flat = nn.Flatten()
-        self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
+class CNN(nn.Module):
+    def __init__(self, nb_frame=10):
+        super(CNN, self).__init__()
+        # Couche de convolution 1
+        self.conv1 = nn.Conv2d(nb_frames*3*256*256, 32, kernel_size=3)
+        # Couche de convolution 2
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
+        # Couche de convolution 3
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3)
+        # Couche fully connected 1
+        self.fc1 = nn.Linear(64 * 4 * 4, 64)
+        # Couche de sortie
+        self.fc2 = nn.Linear(64, 10)
 
     def forward(self, x):
-        y = self.flat(x)
-        y = self.dense1(y)
-        y = self.relu(y)  # Activation ReLU après la première couche dense supplémentaire
-        y = self.dense2(y)
-        y = self.sigmoid(y)
-        return y
+        # Couche de convolution 1 + ReLU + Max pooling
+        x = F.max_pool2d(F.relu(self.conv1(x)), 2)
+        # Couche de convolution 2 + ReLU + Max pooling
+        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+        # Couche de convolution 3 + ReLU
+        x = F.relu(self.conv3(x))
+        # Aplatissement des features
+        x = x.view(-1, 64 * 4 * 4)
+        # Couche fully connected 1 + ReLU
+        x = F.relu(self.fc1(x))
+        # Couche de sortie
+        x = self.fc2(x)
+        return x
 
 # LOGGING
 
